@@ -1,14 +1,3 @@
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// import App from './App';
-
-// ReactDOM.render(<App />, document.getElementById('root'));
-
-/*
-selectionStart experiment
-url: https://stackoverflow.com/questions/58425007/material-ui-text-field-current-cursor-position
-*/
-
 import React, { useState, useRef } from "react";
 import ReactDOM from "react-dom";
 import TextField from "@material-ui/core/TextField";
@@ -22,6 +11,7 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Paper from "@material-ui/core/Paper";
+import axios from "axios";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -42,19 +32,34 @@ function App() {
   const classes = useStyles();
   const inputRef = useRef();
   const [selectionStart, setSelectionStart] = useState();
+  const [outputText, setOutputText] = useState(['ho', 'la']);
 
   const updateSelectionStart = () =>
     setSelectionStart(inputRef.current.selectionStart);
 
   function insertTag(event, name) {
-      let inputAsArray = inputRef.current.value.split("");
-      inputAsArray[selectionStart] = (name === "sep") ? " <sep>" : " <cls>";
-      inputRef.current.value = inputAsArray.join("");
+    let inputAsArray = inputRef.current.value.split("");
+    inputAsArray[selectionStart] = name === "sep" ? " <sep>" : " <cls>";
+    inputRef.current.value = inputAsArray.join("");
   }
 
-  function onChange(event) {
-    console.log(inputRef.current.value);
+  function onClick() {
+    let data = inputRef.current.value;
+    axios
+      .post("http://127.0.0.1:5000/", data, {
+        headers: {
+          "Content-Type": "text/plain",
+          Accept: "application/json"
+        }
+      })
+      .then(res => {
+        let payload = JSON.stringify(Object.values(res)[0]);
+        payload = payload.replace(/,/g, ",  ");
+        setOutputText(payload);
+      })
+      .catch(error => console.log(error))
   }
+
 
   return (
     <div className={classes.root}>
@@ -86,17 +91,15 @@ function App() {
           <Button
             variant="outlined"
             color="primary"
-            onClick={ event => insertTag(event, "sep")}
+            onClick={event => insertTag(event, "sep")}
           >
             {"<sep>"}
-          </Button>
-
-          {" "}
-
-          <Button 
-          onClick={ event => insertTag(event, "cls")}
-          variant="outlined" 
-          color="primary">
+          </Button>{" "}
+          <Button
+            onClick={event => insertTag(event, "cls")}
+            variant="outlined"
+            color="primary"
+          >
             {"<cls>"}
           </Button>
           <br />
@@ -113,7 +116,6 @@ function App() {
                 rowsMax="180"
                 onSelect={updateSelectionStart}
                 inputRef={inputRef}
-                onChange={onChange}
               />
             </form>
           </Paper>
@@ -122,6 +124,7 @@ function App() {
             variant="contained"
             color="primary"
             className={classes.button}
+            onClick={onClick}
           >
             Send
           </Button>
@@ -136,11 +139,12 @@ function App() {
                 id="outlined-multiline-static"
                 rows="15"
                 variant="outlined"
-                label="Tokenized tweet"
+                // label="Tokenized tweet"
                 disabled
                 multiline
                 fullWidth={true}
                 rowsMax="180"
+                value={outputText}
               />
             </form>
           </Paper>
