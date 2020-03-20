@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import ReactDOM from "react-dom";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -17,7 +16,6 @@ const useStyles = makeStyles(theme => ({
   root: {
     "& .MuiTextField-root": {
       margin: theme.spacing(0),
-      //width: 400,
       flexGrow: 1
     },
     paper: {
@@ -32,15 +30,16 @@ function App() {
   const classes = useStyles();
   const inputRef = useRef();
   const [selectionStart, setSelectionStart] = useState();
-  const [outputText, setOutputText] = useState(['ho', 'la']);
+  const [outputText, setOutputText] = useState("");
 
   const updateSelectionStart = () =>
     setSelectionStart(inputRef.current.selectionStart);
 
   function insertTag(event, name) {
     let inputAsArray = inputRef.current.value.split("");
-    inputAsArray[selectionStart] = name === "sep" ? " <sep>" : " <cls>";
+    inputAsArray[selectionStart] = name === "sep" ? " <sep> " : " <cls> ";
     inputRef.current.value = inputAsArray.join("");
+    inputRef.current.focus();
   }
 
   function onClick() {
@@ -57,9 +56,8 @@ function App() {
         payload = payload.replace(/,/g, ",  ");
         setOutputText(payload);
       })
-      .catch(error => console.log(error))
+      .catch(error => console.log(error));
   }
-
 
   return (
     <div className={classes.root}>
@@ -87,7 +85,6 @@ function App() {
         </AppBar>
 
         <Grid item xs={5} style={{ paddingTop: 60 }}>
-          {/* selectionStart: {selectionStart} */}
           <Button
             variant="outlined"
             color="primary"
@@ -139,8 +136,6 @@ function App() {
                 id="outlined-multiline-static"
                 rows="15"
                 variant="outlined"
-                // label="Tokenized tweet"
-                disabled
                 multiline
                 fullWidth={true}
                 rowsMax="180"
