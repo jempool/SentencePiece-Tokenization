@@ -1,5 +1,5 @@
 # SentencePiece-Tokenization
-SentencePiece text tokenizer using Flask and React 
+Tokenizador de palabras en React y Flask utilizando SentencePiece
 
 ## Flask
 
