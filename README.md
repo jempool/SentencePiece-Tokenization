@@ -1,2 +1,2 @@
 # SentencePiece-Tokenization
-SentencePiece text tokenizer using Django and React 
+SentencePiece text tokenizer using Flask and React 
